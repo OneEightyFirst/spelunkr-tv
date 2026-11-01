@@ -43,6 +43,7 @@ final class Updater {
 
     private final Activity activity;
     private final Handler main = new Handler(Looper.getMainLooper());
+    private String waitingForPermission;  // checksum of an update paused on the permission screen
 
     Updater(Activity activity) {
         this.activity = activity;
@@ -75,6 +76,7 @@ final class Updater {
 
     private void download(String expectedSha256) {
         if (Build.VERSION.SDK_INT >= 26 && !activity.getPackageManager().canRequestPackageInstalls()) {
+            waitingForPermission = expectedSha256;
             askForInstallPermission();
             return;
         }
@@ -95,9 +97,18 @@ final class Updater {
         }, "update-download").start();
     }
 
+    /** Called from MainActivity.onResume: carries on once the permission has been allowed. */
+    void resume() {
+        if (waitingForPermission == null || Build.VERSION.SDK_INT < 26
+                || !activity.getPackageManager().canRequestPackageInstalls()) return;
+        String sha = waitingForPermission;
+        waitingForPermission = null;
+        download(sha);
+    }
+
     /** Fire OS 7+ needs "Install unknown apps" allowed for this app, once. */
     private void askForInstallPermission() {
-        Toast.makeText(activity, "Allow Spelunkr TV to install apps, then choose Update again",
+        Toast.makeText(activity, "Allow Spelunkr TV to install apps, then press Back",
                 Toast.LENGTH_LONG).show();
         try {
             activity.startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,

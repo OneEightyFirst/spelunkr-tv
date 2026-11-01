@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
     private boolean offline;
     private long lastBackAt;
     private String tvScript;
+    private Updater updater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +83,8 @@ public class MainActivity extends Activity {
         }
         webView.requestFocus();
 
-        if (savedInstanceState == null) new Updater(this).checkInBackground();
+        updater = new Updater(this);
+        if (savedInstanceState == null) updater.checkInBackground();
     }
 
     @Override
@@ -290,6 +292,7 @@ public class MainActivity extends Activity {
         super.onResume();
         webView.resumeTimers();
         webView.onResume();
+        updater.resume();
     }
 
     @Override
