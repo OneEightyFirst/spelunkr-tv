@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spelunkr TV for Fire TV</title>
+<style>
+  body { margin: 0; background: #1C0A57; color: #fff; font: 20px/1.5 sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 32px 16px; }
+  h1 { color: #FFD640; margin: 0 0 4px; }
+  .sub { color: #C8BEFF; margin: 0 0 28px; }
+  a { color: #FFD640; }
+  .btn { display: inline-block; background: #FFD640; color: #1C0A57; padding: 18px 32px;
+         font-size: 26px; font-weight: bold; text-decoration: none; border-radius: 8px; }
+  .btn:focus { outline: 6px solid #fff; }
+  code { background: rgba(255,255,255,.12); padding: 2px 6px; border-radius: 4px; word-break: break-all; }
+  li { margin-bottom: 8px; }
+  .small { font-size: 16px; color: #C8BEFF; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Spelunkr TV</h1>
+  <p class="sub">An unofficial app that plays <a href="https://spelunkr.tv/">spelunkr.tv</a> full screen on Fire TV and Android TV, controlled with your remote.</p>
+
+  <p><a class="btn" href="spelunkr-tv.apk" autofocus>Download APK ({{VERSION}})</a></p>
+
+  <h2>Install on a Fire TV</h2>
+  <ol>
+    <li>On the Fire TV, install <b>Downloader</b> (by AFTVnews) from the Amazon Appstore.</li>
+    <li>Settings → My Fire TV → Developer Options → Install unknown apps → turn on <b>Downloader</b>.
+      <span class="small">(No Developer Options? Settings → My Fire TV → About, then press OK on the device name 7 times.)</span></li>
+    <li>Open Downloader and enter:<br><code>oneeightyfirst.github.io/spelunkr-tv/spelunkr-tv.apk</code></li>
+    <li>Choose <b>Install</b>. Spelunkr TV appears in your apps.</li>
+  </ol>
+  <p class="small">On other Android TVs, use any file-downloader app with the same address and allow it to install unknown apps.</p>
+
+  <h2>Remote</h2>
+  <ul>
+    <li><b>Arrows / OK</b>: move and select, exactly like the website.</li>
+    <li><b>Back</b>: closes menus and goes back a screen. On the first screen, press it twice to exit.</li>
+    <li><b>Play/Pause, Rewind, Fast-forward</b>: passed to the site.</li>
+  </ul>
+
+  <h2>What this app does (and doesn't)</h2>
+  <ul>
+    <li>It is a single full-screen web view of <code>https://spelunkr.tv/</code>. Nothing else.</li>
+    <li>Its only permission is <b>Internet</b>. No storage, location, microphone, contacts or anything else.</li>
+    <li>It refuses to open any site other than spelunkr.tv.</li>
+    <li>No ads, analytics, trackers or third-party libraries. No connection from the page into the app.</li>
+    <li>The whole thing is one ~250-line Java file. <a href="https://github.com/OneEightyFirst/spelunkr-tv">Read the source</a>.</li>
+    <li>This APK was built by GitHub Actions from commit <code>{{COMMIT}}</code>.<br>
+      SHA-256: <code>{{SHA256}}</code></li>
+  </ul>
+  <p class="small">Not made by or affiliated with Spelunkr. All content belongs to spelunkr.tv and the Internet Archive.</p>
+</main>
+</body>
+</html>

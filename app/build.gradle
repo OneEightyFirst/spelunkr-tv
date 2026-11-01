@@ -1,0 +1,49 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "io.github.oneeightyfirst.spelunkrtv"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "io.github.oneeightyfirst.spelunkrtv"
+        // Fire OS 5 (API 22) covers every Fire TV still in use.
+        minSdk 22
+        targetSdk 35
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    // Release signing comes from environment variables (set by CI from repo secrets).
+    // Without them, `assembleRelease` produces an unsigned APK.
+    def ks = System.getenv("SIGNING_KEYSTORE")
+    signingConfigs {
+        release {
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv("SIGNING_PASSWORD")
+                keyAlias System.getenv("SIGNING_KEY_ALIAS") ?: "spelunkr-tv"
+                keyPassword System.getenv("SIGNING_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false   // keep the APK easy to decompile and inspect
+            if (ks) signingConfig signingConfigs.release
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+// No dependencies. The app uses only the Android framework.
