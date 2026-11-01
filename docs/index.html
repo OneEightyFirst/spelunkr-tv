@@ -38,17 +38,18 @@
   <h2>Remote</h2>
   <ul>
     <li><b>Arrows / OK</b>: move and select, exactly like the website.</li>
-    <li><b>Back</b>: closes menus and goes back a screen. On the first screen, press it twice to exit.</li>
+    <li><b>Back</b>: goes back a screen. From the guide it asks "Leave Spelunkr?"</li>
     <li><b>Play/Pause, Rewind, Fast-forward</b>: passed to the site.</li>
   </ul>
 
   <h2>What this app does (and doesn't)</h2>
   <ul>
-    <li>It is a single full-screen web view of <code>https://spelunkr.tv/</code>. Nothing else.</li>
-    <li>Its only permission is <b>Internet</b>. No storage, location, microphone, contacts or anything else.</li>
+    <li>It is a full-screen web view of spelunkr.tv's own TV mode. Nothing else.</li>
+    <li>Permissions: <b>Internet</b>, and asking to install its own updates. No storage, location, microphone, contacts or anything else.</li>
     <li>It refuses to open any site other than spelunkr.tv.</li>
-    <li>No ads, analytics, trackers or third-party libraries. No connection from the page into the app.</li>
-    <li>The whole thing is one ~250-line Java file. <a href="https://github.com/OneEightyFirst/spelunkr-tv">Read the source</a>.</li>
+    <li>The only thing the page can ask the app to do is close (the site's "Leave" button).</li>
+    <li>On launch it checks this page's <code>version.json</code> for a newer version and asks before installing. Android only accepts updates signed with the same key.</li>
+    <li>No ads, analytics, trackers or third-party libraries. <a href="https://github.com/OneEightyFirst/spelunkr-tv">Read the source</a>.</li>
     <li>This APK was built by GitHub Actions from commit <code>{{COMMIT}}</code>.<br>
       SHA-256: <code>{{SHA256}}</code></li>
   </ul>

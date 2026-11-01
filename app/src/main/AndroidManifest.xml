@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- The only permission this app asks for. Needed to load the website. -->
+    <!-- Needed to load the website (and to check for app updates). -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Lets the app offer its own updates. Android still shows its Install screen and
+         only accepts an update signed with the same key. See Updater.java. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Runs on TVs (no touchscreen) and also on phones/tablets. -->
     <uses-feature android:name="android.software.leanback" android:required="false" />
@@ -19,6 +22,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:configChanges="orientation|screenSize|screenLayout|keyboard|keyboardHidden|navigation|uiMode"
             android:screenOrientation="landscape">
             <intent-filter>

@@ -1,6 +1,7 @@
 package io.github.oneeightyfirst.spelunkrtv;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -18,15 +19,20 @@ import android.widget.Toast;
 
 /**
  * The whole app: a full-screen WebView that shows https://spelunkr.tv/ and
- * passes TV remote buttons through to it.
+ * passes TV remote buttons through to it. It also adds assets/tv.js to the page,
+ * which only moves keyboard focus with the arrow keys where the site doesn't. Updater.java
+ * checks this project's GitHub Pages site for a newer version on launch.
  *
- * What it does NOT do: it has no JavaScript bridge into the app, reads no files,
- * stores nothing of its own, collects nothing, and refuses to navigate to any
- * site other than spelunkr.tv.
+ * The page can ask the app for exactly one thing: SpelunkrApp.leave(), which closes
+ * the app (the site's own "Leave Spelunkr?" button calls it). Nothing else is exposed.
+ *
+ * What it does NOT do: it reads no files, stores nothing of its own, collects
+ * nothing, and refuses to navigate to any site other than spelunkr.tv.
  */
 public class MainActivity extends Activity {
 
-    private static final String HOME_URL = "https://spelunkr.tv/";
+    // "?tv" turns on the site's own TV layout: full-screen player, remote-friendly guide.
+    private static final String HOME_URL = "https://spelunkr.tv/?tv";
     private static final String ALLOWED_HOST = "spelunkr.tv";
     private static final long EXIT_WINDOW_MS = 2000;
 
@@ -36,12 +42,15 @@ public class MainActivity extends Activity {
     private WebChromeClient.CustomViewCallback fullscreenCallback;
     private boolean offline;
     private long lastBackAt;
+    private String tvScript;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // It's a TV channel: don't let the screensaver kick in while it's open.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        if (BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true);  // debug builds only
 
         root = new FrameLayout(this);
         webView = new WebView(this);
@@ -62,14 +71,24 @@ public class MainActivity extends Activity {
         s.setUserAgentString(s.getUserAgentString() + " SpelunkrTV-Android/" + BuildConfig.VERSION_NAME
                 + " (+https://github.com/OneEightyFirst/spelunkr-tv)");
 
+        tvScript = readAsset("tv.js");
         webView.setWebViewClient(new Client());
         webView.setWebChromeClient(new Chrome());
+        webView.addJavascriptInterface(new SpelunkrApp(), "SpelunkrApp");
         webView.setBackgroundColor(0xFF1C0A57);
 
         if (savedInstanceState == null || webView.restoreState(savedInstanceState) == null) {
             webView.loadUrl(HOME_URL);
         }
         webView.requestFocus();
+
+        if (savedInstanceState == null) new Updater(this).checkInBackground();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (Updater.ACTION_INSTALL_STATUS.equals(intent.getAction())) Updater.onInstallStatus(this, intent);
     }
 
     // ---------------------------------------------------------------- remote
@@ -176,7 +195,23 @@ public class MainActivity extends Activity {
         webView.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
     }
 
+    private String readAsset(String name) {
+        try (java.io.InputStream in = getAssets().open(name)) {
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            for (int n; (n = in.read(buf)) > 0; ) out.write(buf, 0, n);
+            return out.toString("UTF-8");
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private class Client extends WebViewClient {
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            if (!offline && isAllowed(Uri.parse(url))) view.evaluateJavascript(tvScript, null);
+        }
+
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             return block(request.getUrl());
@@ -205,6 +240,14 @@ public class MainActivity extends Activity {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             // Android 5.1 (older Fire TVs) only calls this version, and only for the main page.
             if (android.os.Build.VERSION.SDK_INT < 23) showOffline();
+        }
+    }
+
+    /** The site's "Leave Spelunkr?" → LEAVE calls window.SpelunkrApp.leave(). That's all this does. */
+    private class SpelunkrApp {
+        @android.webkit.JavascriptInterface
+        public void leave() {
+            runOnUiThread(MainActivity.this::finish);
         }
     }
 
